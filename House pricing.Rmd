@@ -1,0 +1,181 @@
+---
+title: "House Pricing (MLRM) Analysis"
+author: "Rgahuraam P (2648130)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+## INTRODUCTION
+We have an data of House pricing with some variables which will give the price of the house with the respective variables. We are going to do some analysis by doing scatter plot and coefficient matrix and by fitting an linear regression mode and interpreting the coefficeints.
+
+## 2.OBJECTIVES
+•	To examine the relationship between Price of the House and Other variables using a scatter plot. 
+•	To fit a Multiple linear regression model between the 6 variables. 
+•	To estimate and interpret the intercept and slope of the regression equation. 
+•	To test the significance of the regression parameters using the t-test. 
+•	To obtain confidence interval.
+
+## 3.METHODOLOGY
+## 3.1 - DATA DESCRIPTION
+The dataset used for the analysis is HOUSE PRICING data, consisting of 100 observations and 6 variables. 
+The variables are:
+• Price_lakh (Independent variable)
+• Areaa_sqrt (Dependent variable)
+• Bedrooms (Dependent variable)
+• Age_years (Dependent variable)
+• Distance_km (Dependent variable)
+
+## 4.ANALYSIS
+## 4.1 - 1. Plot a matrix of scatter diagrams between the variables of interest and also find the matrix of coefficient of correlations and interpret it.
+```{r}
+library(readxl)
+data <- read_xlsx("C:/Users/raghu/OneDrive/Desktop/STUDIES/Guithub + Practical college/practicals/R programming/Lab_3/MLR_House_Price_Dataset.xlsx")
+head(data)
+```
+```{r}
+# Dimension of data
+dim(data)
+```
+```{r}
+# Structure of data
+str(data)
+```
+```{r}
+# correlation matrix 
+library(Hmisc)
+data_cor <- data[,c("Price_lakh","Area_sqft","Bedrooms","Age_years","Distance_km")]
+# correlation matrix with p-value
+cor_result <- rcorr(as.matrix(data_cor))
+# correlation coefficients
+cor_result$r
+# p-values
+cor_result$P
+```
+```{r}
+# PLot
+pairs(data_cor[1:5])
+```
+## INTERPRATATION
+1. There is a positive relation between price of the house with number of bedrooms and area of the house.
+2.There is a negative relation between the price of the house with age of the house and distace of the house.
+
+## 4.2 - Fit a multiple linear regression model and interpret the estimated coefficients.
+```{r}
+# R - squared
+y <- data$Price_lakh
+x1 <- data$Area_sqft
+x2 <- data$Bedrooms
+x3 <- data$Age_years
+x4 <- data$Distance_km
+# Case 1: Model with one variable
+slr <- lm(y~x1)
+summary(slr)
+slr2 <- lm(y~x2)
+summary(slr2)
+slr3 <- lm(y~x3)
+summary(slr3)
+slr4 <- lm(y~x4)
+summary(slr4)
+
+# case 2: Model with more variable
+model <- lm(y~x1+x2+x3+x4)
+summary(model)
+
+
+
+```
+## INTERPRETATION
+1. By comparing the R-Squared value the best fit for the regression model  with the variable Area of house in sqft.
+2. For 1 sqft increase in area of the house, the predicted price of the house increases approximately by 0.088 units.
+3. For 1  increase in number of bedroom of the house, the predicted price of the house increases approximately by 8.33 units.
+4. For 1 year increase of the age of  the house, the predicted price of the house decreases approximately by 0.55 units.
+5. For 1km increase in distance  of the house, the predicted price of the house decreases approximately by 1.08 units.
+
+## 4.3 - Test the significance of regression parameters using the t-test and interpret it.
+```{r}
+# t - value from summary of the model 
+b0 = 1.698
+b1 = 45.532
+b2 = 9.622
+b3 = -4.147
+b4 =-3.639
+
+#5% level of significance
+#table values
+qt(0.975, df=95) 
+  
+```
+## INTERPRETATION 
+1. Area_sqft
+
+H_0:beta_1=0: Area_sqft has no significant relationship with Price.
+(H_1:beta_1!=0): Area_sqft has a significant relationship with Price.
+Since the calculated t-value is 45.532, which is greater than the critical t-value of 1.985, we reject (H_0) at the 5% significance level. Therefore, Area_sqft has a statistically significant positive relationship with Price. The positive coefficient (45.532) indicates that, holding the other variables constant, an increase in area is associated with an increase in house price.
+
+2. Bedrooms
+
+(H_0:beta_2=0): Number of bedrooms has no significant relationship with Price.
+(H_1:beta_2!=0): Number of bedrooms has a significant relationship with Price.
+Since the calculated t-value is 9.622 > 1.985, we reject \(H_0\). Therefore, Bedrooms has a statistically significant positive relationship with Price. Holding the other variables constant, an increase in the number of bedrooms is associated with an increase in house price.
+
+3. Age_years
+
+(H_0:beta_3=0): Age_years has no significant relationship with Price.
+(H_1:beta_3!=0): Age_years has a significant relationship with Price.
+Since the absolute value of the calculated t-value is 4.147 > 1.985, we reject \(H_0\). Therefore, Age_years has a statistically significant negative relationship with Price. The negative coefficient (-4.147) indicates that, holding the other variables constant, older properties are associated with lower house prices.
+
+4. Distance_km
+
+(H_0:beta_4=0): Distance_km has no significant relationship with Price.
+(H_1:beta_4!=0): Distance_km has a significant relationship with Price.
+Since the absolute value of the calculated t-value is 3.639 > 1.985, we reject \(H_0\). Therefore, Distance_km has a statistically significant negative relationship with Price. The negative coefficient (-3.639) indicates that, holding the other variables constant, greater distance is associated with lower house prices.
+
+## 4.4 - Examine the quality of the regression fit using an appropriate criteria.
+## INTERPRETATION.
+The coefficient of determination, \(R^2\), is 0.9633, indicating that approximately 96.33% of the variation in house Price is explained by the four independent variables: Area_sqft, Bedrooms, Age_years, and Distance_km. The remaining 3.67% of the variation is explained by other factors not included in the model and random error.
+
+The Adjusted \(R^2\) is 0.9617, which indicates that even after adjusting for the number of predictors in the model, approximately 96.17% of the variation in Price is explained by the model. Since the \(R^2\) and Adjusted \(R^2\) values are very close, the model's explanatory power remains high after accounting for the number of predictors.
+
+## 4.5 -
+
+```{r}
+# confidence interval
+confint(model)
+```
+```{r}
+# Prediction interval
+new_house <- data.frame(
+  x1 = 1200,   # Area_sqft
+  x2 = 3,      # Bedrooms
+  x3 = 10,     # Age_years
+  x4 = 5       # Distance_km
+)
+
+predict(model, newdata = new_house, interval = "confidence", level = 0.95)
+```
+## Interpretation
+
+The estimated price of the new house is 129.7903 lakh. The 95% prediction interval for the price of an individual house with an area of 1200 sq.ft, 3 bedrooms, age of 10 years, and distance of 5 km is (125.2722, 134.3084) lakh.
+
+Therefore, the model predicts that the price of such an individual house is expected to lie between 125.2722 lakh and 134.3084 lakh with 95% prediction confidence.
+
+Area_sqft (x1):
+
+The 95% confidence interval for the coefficient of Area_sqft is (0.08485, 0.09259). Since the interval does not contain zero, Area_sqft has a statistically significant effect on Price. Holding the other variables constant, a one-unit increase in Area_sqft is associated with an increase in Price between 0.08485 and 0.09259 lakh.
+
+Bedrooms (x2):
+
+The 95% confidence interval for the coefficient of Bedrooms is (6.6020, 10.0346). Since zero is not contained in the interval, Bedrooms has a statistically significant positive effect on Price. Holding other variables constant, an additional bedroom is associated with an increase in Price between 6.6020 and 10.0346 lakh.
+
+Age_years (x3):
+
+The 95% confidence interval for the coefficient of Age_years is (-0.8163, -0.2878). Since the entire interval is negative, Age_years has a statistically significant negative effect on Price. Holding other variables constant, a one-year increase in property age is associated with a decrease in Price between 0.2878 and 0.8163 lakh.
+
+Distance_km (x4):
+
+The 95% confidence interval for the coefficient of Distance_km is (-1.6721, -0.4916). Since the entire interval is negative, Distance_km has a statistically significant negative effect on Price. Holding other variables constant, a one-kilometre increase in distance is associated with a decrease in Price between 0.4916 and 1.6721 lakh.
+
